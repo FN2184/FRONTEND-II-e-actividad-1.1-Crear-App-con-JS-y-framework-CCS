@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function App() {
-  const [productos, setProductos] = useState([]);
+  const [productos, setProductos] = useState(() => {
+    const savedProductos = localStorage.getItem('productos');
+    return savedProductos ? JSON.parse(savedProductos) : [];
+  });
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [precio, setPrecio] = useState('');
   const [cantidad, setCantidad] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('productos', JSON.stringify(productos));
+  }, [productos]);
 
   const agregarProducto = (e) => {
     e.preventDefault();
@@ -59,6 +66,16 @@ function App() {
           Agregar Producto
         </button>
       </form>
+      <div>
+        {productos.map((producto) => (
+          <div key={producto.id} className="mb-4">
+            <h3 className="text-lg font-semibold">{producto.nombre}</h3>
+            <p>{producto.descripcion}</p>
+            <p>Precio: ${producto.precio}</p>
+            <p>Cantidad: {producto.cantidad}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
