@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 function App() {
+  // Estado inicial: obtenemos los productos guardados en LocalStorage o inicializamos un array vacío
   const [productos, setProductos] = useState(() => {
     try {
       const savedProductos = localStorage.getItem('productos');
@@ -10,13 +11,18 @@ function App() {
       return [];
     }
   });
+
+  // Variables de estado para los campos del formulario
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [precio, setPrecio] = useState('');
   const [cantidad, setCantidad] = useState('');
-  const [busqueda, setBusqueda] = useState('');
-  const [alerta, setAlerta] = useState(null);
+  const [busqueda, setBusqueda] = useState(''); // Campo de búsqueda
+  const [alerta, setAlerta] = useState(null); // Estado para mostrar mensajes de éxito o error
+  const [modoEdicion, setModoEdicion] = useState(false); // Indicador de si estamos en modo de edición
+  const [productoIdEdicion, setProductoIdEdicion] = useState(null); // Almacena el ID del producto que se está editando
 
+  // useEffect: guarda los productos en LocalStorage cada vez que la lista de productos cambia
   useEffect(() => {
     try {
       localStorage.setItem('productos', JSON.stringify(productos));
@@ -25,36 +31,69 @@ function App() {
     }
   }, [productos]);
 
+  // Función para agregar un nuevo producto o actualizar uno existente
   const agregarProducto = (e) => {
     e.preventDefault();
+    // Validamos que todos los campos del formulario estén llenos
     if (nombre && descripcion && precio && cantidad) {
-      const nuevoProducto = {
-        id: Date.now(),
-        nombre,
-        descripcion,
-        precio,
-        cantidad,
-      };
-      setProductos([...productos, nuevoProducto]);
+      if (modoEdicion) {
+        // Si estamos en modo edición, actualizamos el producto existente
+        const productosActualizados = productos.map((producto) =>
+          producto.id === productoIdEdicion
+            ? { id: productoIdEdicion, nombre, descripcion, precio, cantidad }
+            : producto
+        );
+        setProductos(productosActualizados);
+        setModoEdicion(false); // Salimos del modo edición
+        setAlerta({ tipo: 'success', mensaje: 'Producto actualizado correctamente' });
+      } else {
+        // Si no estamos editando, agregamos un nuevo producto
+        const nuevoProducto = {
+          id: Date.now(), // Usamos la marca de tiempo como ID único
+          nombre,
+          descripcion,
+          precio,
+          cantidad,
+        };
+        setProductos([...productos, nuevoProducto]);
+        setAlerta({ tipo: 'success', mensaje: 'Producto agregado correctamente' });
+      }
+
+      // Limpiamos los campos del formulario después de agregar o actualizar el producto
       setNombre('');
       setDescripcion('');
       setPrecio('');
       setCantidad('');
-      setAlerta({ tipo: 'success', mensaje: 'Producto agregado correctamente' });
+      setProductoIdEdicion(null); // Limpiamos el ID del producto que se estaba editando
     } else {
+      // Si hay algún campo vacío, mostramos un mensaje de error
       setAlerta({ tipo: 'error', mensaje: 'Todos los campos son obligatorios' });
     }
 
+    // Ocultamos la alerta después de 3 segundos
     setTimeout(() => setAlerta(null), 3000);
   };
 
+  // Función para eliminar un producto de la lista
   const eliminarProducto = (id) => {
     const nuevosProductos = productos.filter((producto) => producto.id !== id);
     setProductos(nuevosProductos);
     setAlerta({ tipo: 'success', mensaje: 'Producto eliminado correctamente' });
-    setTimeout(() => setAlerta(null), 3000);
+    setTimeout(() => setAlerta(null), 3000); // Ocultamos la alerta después de 3 segundos
   };
 
+  // Función para editar un producto existente
+  const editarProducto = (producto) => {
+    setModoEdicion(true); // Activamos el modo edición
+    setProductoIdEdicion(producto.id); // Guardamos el ID del producto que se está editando
+    // Rellenamos los campos del formulario con los valores del producto que vamos a editar
+    setNombre(producto.nombre);
+    setDescripcion(producto.descripcion);
+    setPrecio(producto.precio);
+    setCantidad(producto.cantidad);
+  };
+
+  // Filtramos los productos según el término de búsqueda
   const productosFiltrados = productos.filter((producto) =>
     producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -99,7 +138,7 @@ function App() {
             type="submit"
             className="col-span-2 w-full bg-blue-500 text-white p-3 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
           >
-            Agregar Producto
+            {modoEdicion ? 'Actualizar Producto' : 'Agregar Producto'} {/* Cambiamos el texto del botón según el modo */}
           </button>
         </form>
 
@@ -141,8 +180,14 @@ function App() {
                   <td className="px-4 py-2">{producto.cantidad}</td>
                   <td className="px-4 py-2">
                     <button
-                      onClick={() => eliminarProducto(producto.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-200"
+                      onClick={() => editarProducto(producto)} // Botón para editar el producto
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition duration-200"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => eliminarProducto(producto.id)} // Botón para eliminar el producto
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-200 ml-2"
                     >
                       Eliminar
                     </button>
