@@ -2,8 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 function App() {
   const [productos, setProductos] = useState(() => {
-    const savedProductos = localStorage.getItem('productos');
-    return savedProductos ? JSON.parse(savedProductos) : [];
+    try {
+      const savedProductos = localStorage.getItem('productos');
+      return savedProductos ? JSON.parse(savedProductos) : [];
+    } catch (error) {
+      console.error('Error accediendo a LocalStorage:', error);
+      return [];
+    }
   });
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -13,7 +18,11 @@ function App() {
   const [alerta, setAlerta] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('productos', JSON.stringify(productos));
+    try {
+      localStorage.setItem('productos', JSON.stringify(productos));
+    } catch (error) {
+      console.error('Error guardando en LocalStorage:', error);
+    }
   }, [productos]);
 
   const agregarProducto = (e) => {
