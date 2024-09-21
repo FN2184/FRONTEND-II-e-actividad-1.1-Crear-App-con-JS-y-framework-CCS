@@ -48,7 +48,6 @@ function App() {
     setTimeout(() => setAlerta(null), 3000);
   };
 
-  // Nueva función para eliminar productos
   const eliminarProducto = (id) => {
     const nuevosProductos = productos.filter((producto) => producto.id !== id);
     setProductos(nuevosProductos);
@@ -61,75 +60,100 @@ function App() {
   );
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Gestión de Inventario</h1>
-      <form onSubmit={agregarProducto} className="mb-4">
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          className="mb-2 w-full p-2 border"
-        />
-        <input
-          type="text"
-          placeholder="Descripción"
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          className="mb-2 w-full p-2 border"
-        />
-        <input
-          type="number"
-          placeholder="Precio"
-          value={precio}
-          onChange={(e) => setPrecio(e.target.value)}
-          className="mb-2 w-full p-2 border"
-        />
-        <input
-          type="number"
-          placeholder="Cantidad"
-          value={cantidad}
-          onChange={(e) => setCantidad(e.target.value)}
-          className="mb-2 w-full p-2 border"
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-          Agregar Producto
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+      <div className="w-full max-w-3xl bg-white shadow-md rounded-lg p-8">
+        <h1 className="text-4xl font-bold text-center text-gray-800 mb-6">
+          Gestión de Inventario
+        </h1>
 
-      {alerta && (
-        <div
-          className={`mb-4 p-2 rounded ${
-            alerta.tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
-          } text-white`}
-        >
-          {alerta.mensaje}
-        </div>
-      )}
+        <form onSubmit={agregarProducto} className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <input
+            type="text"
+            placeholder="Nombre del Producto"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="text"
+            placeholder="Descripción"
+            value={descripcion}
+            onChange={(e) => setDescripcion(e.target.value)}
+            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="number"
+            placeholder="Precio"
+            value={precio}
+            onChange={(e) => setPrecio(e.target.value)}
+            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <input
+            type="number"
+            placeholder="Cantidad"
+            value={cantidad}
+            onChange={(e) => setCantidad(e.target.value)}
+            className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="col-span-2 w-full bg-blue-500 text-white p-3 rounded-md font-semibold hover:bg-blue-600 transition duration-200"
+          >
+            Agregar Producto
+          </button>
+        </form>
 
-      <input
-        type="text"
-        placeholder="Buscar producto"
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-        className="mb-4 w-full p-2 border"
-      />
-
-      <div>
-        {productosFiltrados.map((producto) => (
-          <div key={producto.id} className="mb-4">
-            <h3 className="text-lg font-semibold">{producto.nombre}</h3>
-            <p>{producto.descripcion}</p>
-            <p>Precio: ${producto.precio}</p>
-            <p>Cantidad: {producto.cantidad}</p>
-            <button
-              onClick={() => eliminarProducto(producto.id)}
-              className="bg-red-500 text-white p-2 rounded"
-            >
-              Eliminar
-            </button>
+        {alerta && (
+          <div
+            className={`mb-6 p-3 text-center rounded-md ${
+              alerta.tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white`}
+          >
+            {alerta.mensaje}
           </div>
-        ))}
+        )}
+
+        <input
+          type="text"
+          placeholder="Buscar Producto"
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="w-full p-3 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        {productosFiltrados.length > 0 ? (
+          <table className="table-auto w-full text-left bg-white">
+            <thead>
+              <tr className="bg-gray-200">
+                <th className="px-4 py-2">Nombre</th>
+                <th className="px-4 py-2">Descripción</th>
+                <th className="px-4 py-2">Precio</th>
+                <th className="px-4 py-2">Cantidad</th>
+                <th className="px-4 py-2">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productosFiltrados.map((producto) => (
+                <tr key={producto.id} className="border-t">
+                  <td className="px-4 py-2">{producto.nombre}</td>
+                  <td className="px-4 py-2">{producto.descripcion}</td>
+                  <td className="px-4 py-2">${producto.precio}</td>
+                  <td className="px-4 py-2">{producto.cantidad}</td>
+                  <td className="px-4 py-2">
+                    <button
+                      onClick={() => eliminarProducto(producto.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-200"
+                    >
+                      Eliminar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-center text-gray-500">No hay productos en el inventario.</p>
+        )}
       </div>
     </div>
   );
