@@ -9,6 +9,7 @@ function App() {
   const [descripcion, setDescripcion] = useState('');
   const [precio, setPrecio] = useState('');
   const [cantidad, setCantidad] = useState('');
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
     localStorage.setItem('productos', JSON.stringify(productos));
@@ -29,6 +30,10 @@ function App() {
     setPrecio('');
     setCantidad('');
   };
+
+  const productosFiltrados = productos.filter((producto) =>
+    producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
 
   return (
     <div className="container mx-auto p-4">
@@ -66,8 +71,17 @@ function App() {
           Agregar Producto
         </button>
       </form>
+
+      <input
+        type="text"
+        placeholder="Buscar producto"
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="mb-4 w-full p-2 border"
+      />
+
       <div>
-        {productos.map((producto) => (
+        {productosFiltrados.map((producto) => (
           <div key={producto.id} className="mb-4">
             <h3 className="text-lg font-semibold">{producto.nombre}</h3>
             <p>{producto.descripcion}</p>
