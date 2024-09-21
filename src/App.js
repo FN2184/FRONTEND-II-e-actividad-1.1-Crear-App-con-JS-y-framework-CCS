@@ -48,6 +48,14 @@ function App() {
     setTimeout(() => setAlerta(null), 3000);
   };
 
+  // Nueva función para eliminar productos
+  const eliminarProducto = (id) => {
+    const nuevosProductos = productos.filter((producto) => producto.id !== id);
+    setProductos(nuevosProductos);
+    setAlerta({ tipo: 'success', mensaje: 'Producto eliminado correctamente' });
+    setTimeout(() => setAlerta(null), 3000);
+  };
+
   const productosFiltrados = productos.filter((producto) =>
     producto.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
@@ -114,6 +122,12 @@ function App() {
             <p>{producto.descripcion}</p>
             <p>Precio: ${producto.precio}</p>
             <p>Cantidad: {producto.cantidad}</p>
+            <button
+              onClick={() => eliminarProducto(producto.id)}
+              className="bg-red-500 text-white p-2 rounded"
+            >
+              Eliminar
+            </button>
           </div>
         ))}
       </div>
