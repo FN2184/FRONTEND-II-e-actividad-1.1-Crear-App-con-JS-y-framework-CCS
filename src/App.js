@@ -10,6 +10,7 @@ function App() {
   const [precio, setPrecio] = useState('');
   const [cantidad, setCantidad] = useState('');
   const [busqueda, setBusqueda] = useState('');
+  const [alerta, setAlerta] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('productos', JSON.stringify(productos));
@@ -17,18 +18,25 @@ function App() {
 
   const agregarProducto = (e) => {
     e.preventDefault();
-    const nuevoProducto = {
-      id: Date.now(),
-      nombre,
-      descripcion,
-      precio,
-      cantidad,
-    };
-    setProductos([...productos, nuevoProducto]);
-    setNombre('');
-    setDescripcion('');
-    setPrecio('');
-    setCantidad('');
+    if (nombre && descripcion && precio && cantidad) {
+      const nuevoProducto = {
+        id: Date.now(),
+        nombre,
+        descripcion,
+        precio,
+        cantidad,
+      };
+      setProductos([...productos, nuevoProducto]);
+      setNombre('');
+      setDescripcion('');
+      setPrecio('');
+      setCantidad('');
+      setAlerta({ tipo: 'success', mensaje: 'Producto agregado correctamente' });
+    } else {
+      setAlerta({ tipo: 'error', mensaje: 'Todos los campos son obligatorios' });
+    }
+
+    setTimeout(() => setAlerta(null), 3000);
   };
 
   const productosFiltrados = productos.filter((producto) =>
@@ -71,6 +79,16 @@ function App() {
           Agregar Producto
         </button>
       </form>
+
+      {alerta && (
+        <div
+          className={`mb-4 p-2 rounded ${
+            alerta.tipo === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white`}
+        >
+          {alerta.mensaje}
+        </div>
+      )}
 
       <input
         type="text"
